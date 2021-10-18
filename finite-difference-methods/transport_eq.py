@@ -14,7 +14,7 @@ class Solve_Transport_Eq:
         self.t_axis = np.linspace(t0, tf, self.time_steps)
         self.CFL = k/h
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-
+        self.exact()
 
     def exact(self):
         #compute exact solution
@@ -145,23 +145,6 @@ class Solve_Transport_Eq:
     def get_err(self, o, approx, t):
         diff = self.exact_sol[t, :] - approx[t, :]
         return np.linalg.norm(diff, o)
-
-    def graph_sol(self, scheme: str, t: int, approx_sol):
-        '''
-        Displays graph of approximated soluton vs exact solution at timestep t
-        :param scheme: Name of scheme used, just used for the title of the plot
-        :param t: The snapshot of the solution to be plotted
-        :param approx_sol: Grid of solution approxmations
-        :return: A matplotlib plot should appear
-        '''
-        y_axis = approx_sol[t]
-        plt.plot(self.x_axis, y_axis, label='Aprroximated Solution')
-        plt.plot(self.x_axis, self.exact_sol[t], label='Exact Solution')
-        plt.ylabel("u(x)")
-        plt.xlabel("x")
-        plt.title(scheme)
-        plt.legend()
-        plt.show()
 
 def call_multiple_h(model, h_arr, k_arr, t, scheme):
     '''

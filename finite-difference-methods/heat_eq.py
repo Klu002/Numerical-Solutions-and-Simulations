@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 class Solve_Heat_Eq:
 
@@ -12,9 +12,10 @@ class Solve_Heat_Eq:
         self.x_axis = np.linspace(x0, xf, self.space_steps)
         self.t_axis = np.linspace(t0, tf, self.time_steps)
         self.sig = k/(h**2)
+        print(self.sig)
         self.initial = [f(x) for x in self.x_axis]
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-    
+
     def set_exact(self, exact):
         self.exact_sol = exact
     
@@ -25,8 +26,6 @@ class Solve_Heat_Eq:
 
         #We also have to recompute the exact solution grid with the new dimensions
         self.t_axis = np.linspace(t0, tf, self.time_steps)
-        self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-        self.exact()
 
         #Initializing grid and operations matrix
         op_mat = np.zeros([self.time_steps, self.space_steps])
@@ -60,7 +59,6 @@ class Solve_Heat_Eq:
 
         self.t_axis = np.linspace(t0, tf, self.time_steps)
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-        self.exact()
 
         l_op_mat = np.zeros([self.time_steps, self.space_steps])
         r_op_mat = np.zeros([self.time_steps, self.space_steps])
@@ -106,21 +104,21 @@ class Solve_Heat_Eq:
     def Forward_Euler(self):
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initial
-        for n in range(1, self.time_steps - 1):
+        for n in range(0, self.time_steps - 1):
             #Left and right end points
             v[n+1, 0] = v[n,0] + self.sig*(v[n, 1] - 2*v[n, 0] + v[n, self.space_steps - 1])
+            
             v[n+1, self.space_steps - 1] = v[n+1, 0]
 
 
             for j in range(1, self.space_steps - 1):
                 v[n+1, j] = v[n, j] + self.sig*(v[n, j+1] - 2*v[n, j] + v[n, j-1])
-            
         return v
 
     def Dufort_Frankel(self):
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initial
-        for n in range(1, self.time_steps - 1):
+        for n in range(0, self.time_steps - 1):
             #Left and right end points
             nmin1_coeff = (1 - 2*self.sig) / (1 + 2 * self.sig)
             ncoeff = (2*self.sig) / (1 + 2 * self.sig)
@@ -134,19 +132,4 @@ class Solve_Heat_Eq:
             
         return v
 
-    def graph_sol(self, scheme: str, t: int, approx_sol):
-        '''
-        Displays graph of approximated soluton vs exact solution at timestep t
-        :param scheme: Name of scheme used, just used for the title of the plot
-        :param t: The snapshot of the solution to be plotted
-        :param approx_sol: Grid of solution approxmations
-        :return: A matplotlib plot should appear
-        '''
-        y_axis = approx_sol[t]
-        plt.plot(self.x_axis, y_axis, label='Aprroximated Solution')
-        plt.plot(self.x_axis, self.exact_sol[t], label='Exact Solution')
-        plt.ylabel("u(x)")
-        plt.xlabel("x")
-        plt.title(scheme)
-        plt.legend()
-        plt.show()
+    
