@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Solve_Wave_Eq:
-
+class Solve_Transport_Eq:
+    
     def __init__(self, h, k, tf, f, t0=0, x0=0, xf=2*np.pi):
+        
         self.h = h
         self.k = k
         self.f = f
