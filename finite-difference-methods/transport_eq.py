@@ -146,31 +146,6 @@ class Solve_Transport_Eq:
         diff = self.exact_sol[t, :] - approx[t, :]
         return np.linalg.norm(diff, o)
 
-def main():
-    def f(t, x):
-        if (0 <=  x + t <= np.pi):
-            return x + t
-        else:
-            return 2*np.pi - x - t
-    
-    
-
-    
-    '''
-    maxes = []
-    for n in range(approx.shape[0]):
-        maxes.append(np.linalg.norm(approx[n, :], float('inf')))
-    plt.plot(range(approx.shape[0]), maxes)
-    plt.ylabel(r'Max($v(x)_n$)')
-    plt.xlabel('Time step')
-    plt.title(r'Naive Centered Scheme, h = $(\frac{1}{2})^7$')
-    plt.show()
-    '''
-    
-
-if __name__ == '__main__':
-    main()
-
 
 
 
