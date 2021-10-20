@@ -19,26 +19,19 @@ class Solve_Heat_Eq:
     def set_exact(self, exact):
         self.exact_sol = exact
     
-    def Backward_Euler(self, t0):
-        #To allow for the matrix to be invertible we must make it square
-        self.time_steps = self.space_steps
-        tf = self.time_steps * self.k 
-
-        #We also have to recompute the exact solution grid with the new dimensions
-        self.t_axis = np.linspace(t0, tf, self.time_steps)
-
+    def Backward_Euler(self):
         #Initializing grid and operations matrix
-        op_mat = np.zeros([self.time_steps, self.space_steps])
+        op_mat = np.zeros([self.space_steps, self.space_steps])
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initial
 
         #Setting up left side operations matrix
-        for n in range(self.time_steps):
+        for n in range(self.space_steps):
             if n == 0:
                 op_mat[n, 0] = 1 + 2*self.sig
                 op_mat[n, 1] = -self.sig
                 op_mat[n, self.space_steps - 1] = -self.sig
-            elif n == self.time_steps - 1:
+            elif n == self.space_steps - 1:
                 op_mat[n, n - 1] = -self.sig
                 op_mat[n, n] = 1 + 2*self.sig
                 op_mat[n, 0] = -self.sig

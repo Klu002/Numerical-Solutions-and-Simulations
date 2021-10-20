@@ -69,11 +69,11 @@ def main():
     h_arr = [1/10]
     approxes = call_multiple_iterable('heat', h_arr, k_arr, "forward_euler", 2, f_heat)
     init_model = heat_eq.Solve_Heat_Eq(1/10, 1/300, 2, f_heat)
-    exact = init_model.Backward_Euler(0)
+    exact = init_model.Backward_Euler()
     for i, a in enumerate(approxes):
         space_steps = round((2*np.pi - 0) / h_arr[i])
         x_axis_a = np.linspace(0, 2*np.pi, space_steps)
-        graph_sol("Forward Euler", 62, 62, a, exact, x_axis_a, init_model.x_axis)
+        graph_sol("Forward Euler", 600-1, 600-1, a, exact, x_axis_a, init_model.x_axis)
 
 if __name__ == '__main__':
     main()
