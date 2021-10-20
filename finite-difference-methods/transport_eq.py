@@ -146,37 +146,6 @@ class Solve_Transport_Eq:
         diff = self.exact_sol[t, :] - approx[t, :]
         return np.linalg.norm(diff, o)
 
-def call_multiple_h(model, h_arr, k_arr, t, scheme):
-    '''
-    Calls a scheme for each h, returns a plot at the specified time step
-    :model: Solve_Wave_Eq object
-    :params h_arr: Array of h values
-    :params k_arr: Array of k values
-    :params t: Time step to print at
-    :params scheme: Scheme to keep on calling
-    '''
-
-    for i, h in enumerate(h_arr):
-        model.change_h(h)
-        model.change_k(k_arr[i])
-        if scheme == 'upwind':
-            approx = model.upwind()
-        elif scheme == 'centered':
-            approx = model.centered()
-        elif scheme == 'lax-wendroff':
-            approx = model.lax_wendroff()
-        elif scheme == 'lax-friedrichs':
-            approx = model.lax_friedrichs()
-        elif scheme == 'backward euler':
-            approx = model.backward_euler()
-        elif scheme == 'crank-nicholson':
-            approx = model.crank_nicholson()
-        else:
-            raise Exception('Invalid scheme')
-        model.graph_sol(scheme, t, approx)
-        print(scheme + " L2 Error: "  + str(model.get_err(2, approx, 2**8 - 1)))
-        print(scheme + " Max Error: "  + str(model.get_err(float('inf'), approx, 2**8 - 1)))
-
 def main():
     def f(t, x):
         if (0 <=  x + t <= np.pi):
