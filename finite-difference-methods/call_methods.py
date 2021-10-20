@@ -58,6 +58,13 @@ def call_multiple_iterable(eq, h_arr, k_arr, scheme, tf, f, t0=0, x0=0, xf=2*np.
 def main():
     def f_heat(x):
         return x - np.pi
+        
+    def f_transport(t, x):
+        if (0 <=  x + t <= np.pi):
+            return x + t
+        else:
+            return 2*np.pi - x - t
+
     k_arr = [1/300]
     h_arr = [1/10]
     approxes = call_multiple_iterable('heat', h_arr, k_arr, "forward_euler", 2, f_heat)
