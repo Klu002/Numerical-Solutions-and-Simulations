@@ -65,11 +65,11 @@ def main():
         else:
             return 2*np.pi - x - t
 
-    k_arr = [1/300]
-    h_arr = [1/10]
+    k_arr = [1/30000]
+    h_arr = [1/100]
     approxes = call_multiple_iterable('heat', h_arr, k_arr, "forward_euler", 2, f_heat)
-    init_model = heat_eq.Solve_Heat_Eq(1/10, 1/300, 2, f_heat)
-    exact = init_model.Backward_Euler()
+    init_model = heat_eq.Solve_Heat_Eq(1/100, 1/30000, 2, f_heat)
+    exact = init_model.Crank_Nicolson()
     for i, a in enumerate(approxes):
         space_steps = round((2*np.pi - 0) / h_arr[i])
         x_axis_a = np.linspace(0, 2*np.pi, space_steps)

@@ -46,25 +46,21 @@ class Solve_Heat_Eq:
         
         return v
 
-    def Crank_Nicolson(self, t0):
-        self.time_steps = self.space_steps
-        tf = self.time_steps * self.k 
+    def Crank_Nicolson(self):
+        self.exact_sol = np.zeros([self.space_steps, self.space_steps])
 
-        self.t_axis = np.linspace(t0, tf, self.time_steps)
-        self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-
-        l_op_mat = np.zeros([self.time_steps, self.space_steps])
-        r_op_mat = np.zeros([self.time_steps, self.space_steps])
+        l_op_mat = np.zeros([self.space_steps, self.space_steps])
+        r_op_mat = np.zeros([self.space_steps, self.space_steps])
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initial
 
         #Setting up left side operations matrix
-        for n in range(self.time_steps):
+        for n in range(self.space_steps):
             if n == 0:
+                l_op_mat[n, self.space_steps - 1] = -self.sig/2
                 l_op_mat[n, 0] = 1 + self.sig
                 l_op_mat[n, 1] = -self.sig/2
-                l_op_mat[n, self.space_steps - 1] = -self.sig/2
-            elif n == self.time_steps - 1:
+            elif n == self.space_steps - 1:
                 l_op_mat[n, n - 1] = -self.sig/2
                 l_op_mat[n, n] = 1 + self.sig
                 l_op_mat[n, 0] = -self.sig/2
@@ -74,24 +70,24 @@ class Solve_Heat_Eq:
                 l_op_mat[n, n + 1] = -self.sig/2
 
         #Setting up right side operations matrix
-        for n in range(self.time_steps):
+        for n in range(self.space_steps):
             if n == 0:
+                r_op_mat[n, self.space_steps - 1] = self.sig/2
                 r_op_mat[n, 0] = 1 - self.sig
                 r_op_mat[n, 1] = self.sig/2
-                r_op_mat[n, self.space_steps - 1] = self.sig/2
-            elif n == self.time_steps - 1:
+            elif n == self.space_steps - 1:
                 r_op_mat[n, n - 1] = self.sig/2
                 r_op_mat[n, n] = 1 - self.sig
                 r_op_mat[n, 0] = self.sig/2
             else:
                 r_op_mat[n, n - 1] = self.sig/2
-                r_op_mat[n, n] = 1 + self.sig
+                r_op_mat[n, n] = 1 - self.sig
                 r_op_mat[n, n + 1] = self.sig/2
 
         l_op_mat = np.linalg.inv(l_op_mat)
+        op_mat  = np.matmul(l_op_mat, r_op_mat)
         for n in range(self.time_steps - 1):
-            v[n+1, :] = np.matmul(np.matmul(l_op_mat, r_op_mat), v[n, :])
-
+            v[n+1, :] = np.matmul(op_mat, v[n, :])
         return v
     
     def Forward_Euler(self):
