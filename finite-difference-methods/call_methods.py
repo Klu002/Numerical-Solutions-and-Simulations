@@ -1,5 +1,6 @@
 import heat_eq
 import transport_eq
+import viscid_burgers
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -64,7 +65,13 @@ def main():
             return x + t
         else:
             return 2*np.pi - x - t
+    
+    model = viscid_burgers.Solve_Viscid_Burgers(1/100, 1/300, 50, f_heat, 1)
+    approx = model.Fully_Implicit()
+    plt.plot(model.x_axis, approx[1500-1])
+    plt.show()
 
+    '''
     k_arr = [1/30000]
     h_arr = [1/100]
     approxes = call_multiple_iterable('heat', h_arr, k_arr, "forward_euler", 2, f_heat)
@@ -74,7 +81,7 @@ def main():
         space_steps = round((2*np.pi - 0) / h_arr[i])
         x_axis_a = np.linspace(0, 2*np.pi, space_steps)
         graph_sol("Forward Euler", 600-1, 600-1, a, exact, x_axis_a, init_model.x_axis)
-
+    '''
 if __name__ == '__main__':
     main()
 
