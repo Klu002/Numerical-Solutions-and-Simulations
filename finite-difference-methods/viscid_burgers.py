@@ -31,17 +31,17 @@ class Solve_Viscid_Burgers:
             op_mat = np.zeros([self.space_steps, self.space_steps])
             for n in range(self.space_steps):
                 if n == 0:
-                    op_mat[n, self.space_steps - 1] = -cof + half_lam * v[t, 0]
+                    op_mat[n, self.space_steps - 1] = -cof - half_lam * v[t, 0]
                     op_mat[n, 0] = 1 + 2*cof
-                    op_mat[n, 1] = -cof - half_lam * v[t, 0]
+                    op_mat[n, 1] = -cof + half_lam * v[t, 0]
                 elif n == self.space_steps - 1:
-                    op_mat[n, n - 1] = -cof + half_lam * v[t, n]
+                    op_mat[n, n - 1] = -cof - half_lam * v[t, n]
                     op_mat[n, n] = 1 + 2*cof
-                    op_mat[n, 0] =  -cof - half_lam * v[t, n]
+                    op_mat[n, 0] =  -cof + half_lam * v[t, n]
                 else:
-                    op_mat[n, n - 1] = -cof + half_lam * v[t, n]
+                    op_mat[n, n - 1] = -cof - half_lam * v[t, n]
                     op_mat[n, n] = 1 + 2*cof
-                    op_mat[n, n + 1] = -cof - half_lam * v[t, n]
+                    op_mat[n, n + 1] = -cof + half_lam * v[t, n]
             op_mat = np.linalg.inv(op_mat)
 
             v[t+1, :] = np.matmul(op_mat, v[t, :])

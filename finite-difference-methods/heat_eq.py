@@ -87,6 +87,8 @@ class Solve_Heat_Eq:
         l_op_mat = np.linalg.inv(l_op_mat)
         op_mat  = np.matmul(l_op_mat, r_op_mat)
         for n in range(self.time_steps - 1):
+            if n % 1000 == 0:
+                print("Current Timestep: {}/{}".format(n, self.time_steps))
             v[n+1, :] = np.matmul(op_mat, v[n, :])
         return v
     
@@ -96,11 +98,10 @@ class Solve_Heat_Eq:
         for n in range(0, self.time_steps - 1):
             #Left and right end points
             v[n+1, 0] = v[n,0] + self.sig*(v[n, 1] - 2*v[n, 0] + v[n, self.space_steps - 1])
-            
-            v[n+1, self.space_steps - 1] = v[n+1, 0]
+            l = self.space_steps - 1
+            v[n+1, l] = v[n,l] + self.sig*(v[n, 0] - 2*v[n, l] + v[n, l-1])
 
-
-            for j in range(1, self.space_steps - 1):
+            for j in range(1, self.space_steps - 2):
                 v[n+1, j] = v[n, j] + self.sig*(v[n, j+1] - 2*v[n, j] + v[n, j-1])
         return v
 
@@ -113,8 +114,7 @@ class Solve_Heat_Eq:
             ncoeff = (2*self.sig) / (1 + 2 * self.sig)
 
             v[n+1, 0] = nmin1_coeff*v[n - 1, 0] + ncoeff*(v[n, 1] + v[n, self.space_steps - 1])
-            v[n+1, self.space_steps - 1] = v[n+1, 0]
-
+            v[n+1, self.space_steps - 1] = nmin1_coeff*v[n - 1, self.space_steps - 1] + ncoeff*(v[n, 0] + v[n, self.space_steps - 1])
 
             for j in range(1, self.space_steps - 1):
                 v[n+1, j] = nmin1_coeff*v[n - 1, j] + ncoeff*(v[n, j+1] + v[n, j-1])

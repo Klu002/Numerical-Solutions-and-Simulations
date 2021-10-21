@@ -30,3 +30,37 @@ class Solve_Second_Order_Wave:
             for j in range(1, self.space_steps - 1):
                 v[n+1, j] = coef*v[n,j-1] + (-2*coef+2)*v[n, j] + coef*v[n, j+1] - v[n-1, j]
         return v
+
+    def Newmark(self):
+        cof = (self.k*self.c**2) / (2 * self.h**2)
+        u = np.zeros([self.time_steps, self.space_steps])
+        w = np.zeros([self.time_steps, self.space_steps])
+        op_mat = np.zeros([self.space_steps, self.space_steps])
+
+        u[0, :] = self.initialf
+        w[0, :] = self.initialg
+        for n in range(self.space_steps):
+            if n == 0:
+                op_mat[n, 1] = op_mat[n, self.space_steps - 1] = -cof
+            elif n == self.space_steps - 1:
+                op_mat[n, n - 1] = op_mat[n, 0] =  -cof
+            else:
+                op_mat[n, n - 1] = op_mat[n, n + 1] = -cof
+            op_mat[n, n] = 2/self.k + 2*cof
+        op_mat = np.linalg.inv(op_mat)
+
+        for t in range(self.time_steps - 1):
+            right = np.ones(self.space_steps)
+            for j in range(self.space_steps):
+                if j == 0:
+                    r = 2*w[t, j] + cof*(u[t, self.space_steps-1] - 2*u[t,j] + u[t, j+1]) + 2/self.k*u[t,j]
+                elif j == self.space_steps-1:
+                    r = 2*w[t, j] + cof*(u[t, j-1] - 2*u[t,j] + u[t, 0]) + 2/self.k*u[t,j]
+                else:
+                    r = 2*w[t, j] + cof*(u[t, j-1] - 2*u[t,j] + u[t, j+1]) + 2/self.k*u[t,j]
+                right[j] = r
+            u[t+1, :] = np.matmul(op_mat, right)
+            w[t+1, :] = 2/self.k *(u[t+1,:] - u[t, :]) - w[t, :]
+        return u
+
+
