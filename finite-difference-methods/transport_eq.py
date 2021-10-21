@@ -142,6 +142,15 @@ class Solve_Transport_Eq:
 
         return v
     
+    def method_of_lines(self, q_num):
+        A = np.zeros([self.space_steps, self.space_steps])
+        w = np.zeros([self.time_steps, self.space_steps])
+        w[0, :] = self.initial
+        if q_num == 6:
+            pass
+
+
+
     def get_err(self, o, approx, t):
         diff = self.exact_sol[t, :] - approx[t, :]
         return np.linalg.norm(diff, o)
