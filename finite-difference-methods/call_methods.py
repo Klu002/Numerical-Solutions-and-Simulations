@@ -1,10 +1,11 @@
 import heat_eq
 import transport_eq
 import viscid_burgers
+import second_order_wave
 import numpy as np
 import matplotlib.pyplot as plt
 
-def graph_sol(scheme, t1, t2, approx_sol, exact, x_axis_a, x_axis_e):
+def graph_sol(scheme, t1, approx_sol, x_axis_a, x_axis_e=None, t2=None, exact=None, save_dir=None):
         '''
         Displays graph of approximated soluton vs exact solution at timestep t
         :param scheme: Name of scheme used, just used for the title of the plot
@@ -15,11 +16,14 @@ def graph_sol(scheme, t1, t2, approx_sol, exact, x_axis_a, x_axis_e):
 
         y_axis_a = approx_sol[t1]
         plt.plot(x_axis_a, y_axis_a, label='Aprroximated Solution')
-        plt.plot(x_axis_e, exact[t2], label='Exact Solution')
+        if exact:
+            plt.plot(x_axis_e, exact[t2], label='Exact Solution')
         plt.ylabel("u(x)")
         plt.xlabel("x")
         plt.title(scheme)
         plt.legend()
+        if save_dir:
+            plt.savefig(save_dir, format='png')
         plt.show()
     
 def call_multiple_iterable(eq, h_arr, k_arr, scheme, tf, f, t0=0, x0=0, xf=2*np.pi):
@@ -68,9 +72,15 @@ def main():
     
     model = viscid_burgers.Solve_Viscid_Burgers(1/100, 1/300, 50, f_heat, 1)
     approx = model.Fully_Implicit()
-    plt.plot(model.x_axis, approx[1500-1])
-    plt.show()
+    gdir = 'Example_Solution_Graphs/'
+    graph_sol("Viscid Burgers Fully Implicit", 1500-1, approx, model.x_axis, save_dir=gdir + 'VBFIT50.png')
+    '''
 
+    model = second_order_wave.Solve_Second_Order_Wave(1/100, 1/200, 1, np.sin, np.cos, 1)
+    approx = model.Leap_Frog()
+    plt.plot(model.x_axis, approx[199])
+    plt.show()
+    '''
     '''
     k_arr = [1/30000]
     h_arr = [1/100]
