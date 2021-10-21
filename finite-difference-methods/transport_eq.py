@@ -146,10 +146,49 @@ class Solve_Transport_Eq:
         A = np.zeros([self.space_steps, self.space_steps])
         w = np.zeros([self.time_steps, self.space_steps])
         w[0, :] = self.initial
+        l = self.space_steps - 1
         if q_num == 6:
-            pass
+            for n in range(self.space_steps):
+                if n == 0:
+                    A[n, 1], A[n, 2], A[n, 3] = 45, -9, 1
+                    A[n, l], A[n, l-1], A[n, l-2] = -45, 9, -1
+                elif n == 1:
+                    A[n, 2], A[n, 3], A[n, 4] = 45, -9, 1
+                    A[n, 0], A[n, l], A[n, l-1] = -45, 9, -1
+                elif n == 2:
+                    A[n, 3], A[n, 4], A[n, 5] = 45, -9, 1
+                    A[n, 1], A[n, 0], A[n, l] = -45, 9, -1
+                elif n == l:
+                    A[n, 0], A[n, 1], A[n, 2] = 45, -9, 1
+                    A[n, l-1], A[n, l-2], A[n, l-3] = -45, 9, -1
+                elif n == l-1:
+                    A[n, l], A[n, 0], A[n, 1] = 45, -9, 1
+                    A[n, l-2], A[n, l-3], A[n, l-4] = -45, 9, -1
+                elif n == l-2:
+                    A[n, l-1], A[n, l], A[n, 0] = 45, -9, 1
+                    A[n, l-3], A[n, l-4], A[n, l-5] = -45, 9, -1
+                else:
+                    A[n, n+1], A[n, n+2], A[n, n+3] = 45, -9, 1
+                    A[n, n-1], A[n, n-2], A[n, n-3] = -45, 9, -1
+        #4 Stage Runge-Kutta
+        for n in range(self.time_steps-1):
+            m1 = self.k * np.matmul(A, w[n, :])
 
+            #Save computation for reuse
+            a_pow2 = np.linalg.matrix_power(A, 2)
+            mat_op2 = self.k * A + (self.k**2)/2 * a_pow2
+            m2 = np.matmul(mat_op2, w[n, :])
 
+            a_pow3 = np.matmul(a_pow2, A)
+            mat_op3 = mat_op2 + (self.k**3)/4 * a_pow3
+            m3 = np.matmul(mat_op3, w[n, :])
+
+            a_pow4 = np.matmul(a_pow3, A)
+            m4 = np.matmul(mat_op3*2 - self.k*A + (self.k**4)/4*a_pow4, w[n, :])
+
+            w[n+1, :] = w[n, :] + 1/6 * (m1 + 2*m2 + 2*m3 + m4)
+        
+        return w
 
     def get_err(self, o, approx, t):
         diff = self.exact_sol[t, :] - approx[t, :]
