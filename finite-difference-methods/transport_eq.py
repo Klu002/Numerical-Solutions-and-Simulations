@@ -13,8 +13,9 @@ class Solve_Transport_Eq:
         self.x_axis = np.linspace(x0, xf, self.space_steps)
         self.t_axis = np.linspace(t0, tf, self.time_steps)
         self.CFL = k/h
+        self.initial = [f(x) for x in self.x_axis]
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-        self.exact()
+        #self.exact()
 
     def exact(self):
         #compute exact solution
@@ -170,6 +171,24 @@ class Solve_Transport_Eq:
                 else:
                     A[n, n+1], A[n, n+2], A[n, n+3] = 45, -9, 1
                     A[n, n-1], A[n, n-2], A[n, n-3] = -45, 9, -1
+        elif q_num == 4:
+            for n in range(self.space_steps):
+                if n == 0:
+                    A[n, 1], A[n, 2] = 8, -1
+                    A[n, l], A[n, l-1] = -8, 1
+                elif n == 1:
+                    A[n, 2], A[n, 3] = 8, -1
+                    A[n, 0], A[n, l] = -8, 1
+                elif n == l:
+                    A[n, 0], A[n, 1] = 8, -1
+                    A[n, l-1], A[n, l-2] = -8, 1
+                elif n == l-1:
+                    A[n, l], A[n, 0] = 8, -1
+                    A[n, l-2], A[n, l-3] = -8, 1
+                else:
+                    A[n, n+1], A[n, n+2] = 8, -1
+                    A[n, n-1], A[n, n-2] = -8, 1
+                    
         #4 Stage Runge-Kutta
         for n in range(self.time_steps-1):
             m1 = self.k * np.matmul(A, w[n, :])

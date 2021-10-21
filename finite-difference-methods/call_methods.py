@@ -69,13 +69,18 @@ def main():
             return x + t
         else:
             return 2*np.pi - x - t
-    
+    '''
     model = viscid_burgers.Solve_Viscid_Burgers(1/100, 1/300, 50, f_heat, 1)
     approx = model.Fully_Implicit()
     gdir = 'Example_Solution_Graphs/'
     graph_sol("Viscid Burgers Fully Implicit", 1500-1, approx, model.x_axis, save_dir=gdir + 'VBFIT50.png')
     '''
 
+    model = transport_eq.Solve_Transport_Eq(1/100, 1/300, 1, f_heat)
+    approx = model.method_of_lines(4)
+    gdir = 'Example_Solution_Graphs/'
+    graph_sol("Transport Equation Method of Lines Q4", 299, approx, model.x_axis, save_dir=gdir + 'TEMOLT1Q4.png')
+    '''
     model = second_order_wave.Solve_Second_Order_Wave(1/100, 1/200, 1, np.sin, np.cos, 1)
     approx = model.Leap_Frog()
     plt.plot(model.x_axis, approx[199])
