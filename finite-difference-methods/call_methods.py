@@ -80,6 +80,21 @@ def call_multiple_iterable(eq, h_arr, k_arr, scheme, tf, f, t0=0, x0=0, xf=2*np.
 
     return approximations
 
+def h_norm(approx, exact, h, h2=None):
+    grid_points = []
+    for n,v in enumerate(approx):
+        if h2 is not None:
+            #If we have a second h2, we convert to the equivilent index in the exact solution
+            n2 = int(n*h / h2)
+            if n == len(approx)-1 and n2 < len(exact) - 1:
+                grid_points.append(v-exact[-1])
+            else:
+                grid_points.append(v-exact[n2])
+        else:
+            #If we do not, then exact is a function so we evaluate the difference at that space step
+            grid_points.append(v-exact(n*h))
+    return np.linalg.norm(grid_points)
+
 def main():
     def f_heat(x):
         return x - np.pi
