@@ -2,11 +2,13 @@ import numpy as np
 
 class Solve_Second_Order_Wave:
 
-    def __init__(self, h, k, tf, f, g, c, t0=0, x0=0, xf=2*np.pi):
+    def __init__(self, h, k, tf, f, g, c, t0=0, x0=0, xf=2*np.pi, exact=None):
         self.h = h
         self.k = k
         self.f = f
+        self.g = g
         self.c = c
+        self.exact = exact
         self.time_steps = round((tf - t0) / k)
         self.space_steps = round((xf - x0) / h)
         self.x_axis = np.linspace(x0, xf, self.space_steps)
@@ -14,12 +16,17 @@ class Solve_Second_Order_Wave:
         self.initialf = np.array([f(x) for x in self.x_axis])
         self.initialg = np.array([g(x) for x in self.x_axis])
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
-    
+
+    def get_exact(self):
+        #compute exact solution
+        for n in range(self.time_steps):
+            for j in range(self.space_steps):
+                self.exact_sol[n,j] = self.exact(self.t_axis[n], self.x_axis[j])
+
     def Leap_Frog(self):
-        coef = (self.h**2 * self.c **2)/(self.h**2)
+        coef = (self.k**2 * self.c **2)/(self.h**2)
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initialf
-        print(self.initialg)
         v[1, :] = self.initialf + self.k * self.initialg
         for n in range(1, self.time_steps - 1):
             #Left and right end points

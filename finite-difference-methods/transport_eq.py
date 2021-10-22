@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 class Solve_Transport_Eq:
     
-    def __init__(self, h, k, tf, f, t0=0, x0=0, xf=2*np.pi):
+    def __init__(self, h, k, tf, f, sol_f=None, t0=0, x0=0, xf=2*np.pi):
         
         self.h = h
         self.k = k
@@ -15,13 +15,14 @@ class Solve_Transport_Eq:
         self.CFL = k/h
         self.initial = [f(x) for x in self.x_axis]
         self.exact_sol = np.zeros([self.time_steps, self.space_steps])
+        self.sol_f = sol_f
         #self.exact()
 
     def exact(self):
         #compute exact solution
         for n in range(self.time_steps):
             for j in range(self.space_steps):
-                self.exact_sol[n,j] = self.f(self.t_axis[n], self.x_axis[j])
+                self.exact_sol[n,j] = self.sol_f(self.t_axis[n], self.x_axis[j])
         
     
     def upwind(self):
@@ -171,6 +172,7 @@ class Solve_Transport_Eq:
                 else:
                     A[n, n+1], A[n, n+2], A[n, n+3] = 45, -9, 1
                     A[n, n-1], A[n, n-2], A[n, n-3] = -45, 9, -1
+            A = 1/(60*self.h) * A
         elif q_num == 4:
             for n in range(self.space_steps):
                 if n == 0:
@@ -188,7 +190,7 @@ class Solve_Transport_Eq:
                 else:
                     A[n, n+1], A[n, n+2] = 8, -1
                     A[n, n-1], A[n, n-2] = -8, 1
-                    
+            A = 1/(12*self.h) * A
         #4 Stage Runge-Kutta
         for n in range(self.time_steps-1):
             m1 = self.k * np.matmul(A, w[n, :])

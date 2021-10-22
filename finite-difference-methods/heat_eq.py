@@ -43,7 +43,6 @@ class Solve_Heat_Eq:
         op_mat = np.linalg.inv(op_mat)
         for n in range(self.time_steps - 1):
             v[n+1, :] = np.matmul(op_mat, v[n, :])
-        
         return v
 
     def Crank_Nicolson(self):
@@ -100,23 +99,30 @@ class Solve_Heat_Eq:
             v[n+1, 0] = v[n,0] + self.sig*(v[n, 1] - 2*v[n, 0] + v[n, self.space_steps - 1])
             l = self.space_steps - 1
             v[n+1, l] = v[n,l] + self.sig*(v[n, 0] - 2*v[n, l] + v[n, l-1])
-
+            #print("time step: {}, val: {}, v_l: {}, v_mid: {}, v_right: {}".format(n, self.sig*(v[n, 0] - 2*v[n, l] + v[n, l-1]), v[n, l-1], v[n, l], v[n, 0]))
             for j in range(1, self.space_steps - 2):
                 v[n+1, j] = v[n, j] + self.sig*(v[n, j+1] - 2*v[n, j] + v[n, j-1])
+            
         return v
 
     def Dufort_Frankel(self):
         v = np.zeros([self.time_steps, self.space_steps])
         v[0, :] = self.initial
-        for n in range(0, self.time_steps - 1):
+        v[1, 0] = v[0,0] + (1/3)*(v[0, 1] - 2*v[0, 0] + v[0, self.space_steps - 1])
+        l = self.space_steps - 1
+        v[1, l] = v[0,l] + (1/3)*(v[0, 0] - 2*v[0, l] + v[0, l-1])
+        for j in range(1, self.space_steps - 2):
+            v[1, j] = v[0, j] + self.sig*(v[0, j+1] - 2*v[0, j] + v[0, j-1])
+
+        for n in range(1, self.time_steps - 1):
             #Left and right end points
             nmin1_coeff = (1 - 2*self.sig) / (1 + 2 * self.sig)
             ncoeff = (2*self.sig) / (1 + 2 * self.sig)
 
             v[n+1, 0] = nmin1_coeff*v[n - 1, 0] + ncoeff*(v[n, 1] + v[n, self.space_steps - 1])
-            v[n+1, self.space_steps - 1] = nmin1_coeff*v[n - 1, self.space_steps - 1] + ncoeff*(v[n, 0] + v[n, self.space_steps - 1])
+            v[n+1, self.space_steps - 1] = nmin1_coeff*v[n - 1, self.space_steps - 1] + ncoeff*(v[n, 0] + v[n, self.space_steps - 2])
 
-            for j in range(1, self.space_steps - 1):
+            for j in range(1, self.space_steps - 2):
                 v[n+1, j] = nmin1_coeff*v[n - 1, j] + ncoeff*(v[n, j+1] + v[n, j-1])
             
         return v

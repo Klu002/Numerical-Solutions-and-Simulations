@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 class Solve_Viscid_Burgers:
     def __init__(self, h, k, tf, f, eta, t0=0, x0=0, xf=2*np.pi):
@@ -27,6 +28,7 @@ class Solve_Viscid_Burgers:
         cof = self.eta * self.sig
         half_lam = self.k / (2 * self.h)
 
+        ti = time.perf_counter()
         for t in range(self.time_steps - 1):
             op_mat = np.zeros([self.space_steps, self.space_steps])
             for n in range(self.space_steps):
@@ -45,10 +47,12 @@ class Solve_Viscid_Burgers:
             op_mat = np.linalg.inv(op_mat)
 
             v[t+1, :] = np.matmul(op_mat, v[t, :])
-        
+        tf = time.perf_counter()
+        print(f"Fully Implicit Time: {ti - tf:0.4f}")
         return v
 
     def Semi_Implicit(self):
+        
         cof = self.eta * self.sig
         half_lam = self.k / (2 * self.h)
 
@@ -58,6 +62,7 @@ class Solve_Viscid_Burgers:
         v[0, :] = self.initial
 
         #Fill out and invert operations matrix
+        ti = time.perf_counter()
         for n in range(self.space_steps):
             if n == 0:
                 op_mat[n, 1] = op_mat[n, self.space_steps - 1] = -cof
@@ -79,5 +84,6 @@ class Solve_Viscid_Burgers:
                     r = v[t, j] + half_lam * v[t, j] * (v[t, j+1] - v[t, j-1])
                 right[j] = r
             v[t+1, :] = np.matmul(op_mat, right)
-
+        tf = time.perf_counter()
+        print(f"Semi Implicit Time: {ti - tf:0.4f}")
         return v
